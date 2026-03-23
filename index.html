@@ -268,13 +268,8 @@
   }
 
   function getSuggestedValue(row) {
-    const suggestedInput = row.querySelector('.suggested-input');
-    if (suggestedInput) {
-      return parseFloat(suggestedInput.value) || 0;
-    }
-
     const amountInput = row.querySelector('.amount-input');
-    return parseFloat(amountInput.dataset.suggested) || 0;
+    return parseFloat(row.dataset.suggested || amountInput.dataset.suggested) || 0;
   }
 
   function buildStatusMarkup(value, suggested) {
@@ -313,9 +308,16 @@
     };
 
     const config = defaults[type];
+    const suggestedAmount = promptForSuggestedAmount(config.tagText);
+    if (suggestedAmount === null) {
+      customRowCount -= 1;
+      return;
+    }
+
     const row = document.createElement('tr');
     row.className = 'budget-row custom-row';
     row.dataset.group = type;
+    row.dataset.suggested = String(suggestedAmount);
     row.innerHTML = `
       <td>
         <div class="custom-label-wrap">
@@ -324,8 +326,8 @@
         </div>
       </td>
       <td class="center"><span class="tag ${config.tagClass}">${config.tagText}</span></td>
-      <td class="center"><input class="suggested-input" type="number" value="0" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
-      <td class="center"><input class="amount-input" type="number" value="0" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center">${formatMoney(suggestedAmount)}</td>
+      <td class="center"><input class="amount-input" type="number" data-suggested="${suggestedAmount}" value="${suggestedAmount}" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
       <td class="center budget-status"></td>
     `;
 
@@ -336,6 +338,22 @@
     labelInput.focus();
     labelInput.select();
     recalc();
+  }
+
+  function promptForSuggestedAmount(label) {
+    const response = window.prompt(`Suggested amount for this ${label.toLowerCase()}?`, '0');
+
+    if (response === null) {
+      return null;
+    }
+
+    const value = Number(response.replace(/[$,]/g, '').trim());
+    if (!Number.isFinite(value) || value < 0) {
+      window.alert('Enter a valid non-negative amount.');
+      return promptForSuggestedAmount(label);
+    }
+
+    return value;
   }
 
   function removeBudgetRow(button) {
