@@ -114,6 +114,11 @@
     display: flex; align-items: center; gap: 8px;
   }
   .custom-label-wrap .cat-label { flex: 1; }
+  .custom-suggested {
+    display: inline-block; padding: 4px 9px; border-radius: 999px;
+    background: #eef1f7; color: #5f6368; font-size: 0.72rem; font-weight: 700;
+    letter-spacing: .02em;
+  }
 
   tfoot td {
     padding: 10px 14px; font-weight: 700; font-size: 0.85rem;
@@ -261,7 +266,6 @@
 <script>
   const INCOME = 4050;
   const tableBody = document.getElementById('tableBody');
-  let customRowCount = 0;
 
   function formatMoney(value) {
     return '$' + Number(value).toLocaleString();
@@ -300,19 +304,13 @@
   }
 
   function addBudgetRow(type) {
-    customRowCount += 1;
-
     const defaults = {
-      need: { emoji: '➕', label: `New Need ${customRowCount}`, tagClass: 'need', tagText: 'Need', anchorId: 'wants-section' },
-      want: { emoji: '✨', label: `New Want ${customRowCount}`, tagClass: 'want', tagText: 'Want', anchorId: 'savings-section' },
+      need: { emoji: '➕', label: 'Custom Item', tagClass: 'need', tagText: 'Need', anchorId: 'wants-section' },
+      want: { emoji: '✨', label: 'Custom Item', tagClass: 'want', tagText: 'Want', anchorId: 'savings-section' },
     };
 
     const config = defaults[type];
-    const suggestedAmount = promptForSuggestedAmount(config.tagText);
-    if (suggestedAmount === null) {
-      customRowCount -= 1;
-      return;
-    }
+    const suggestedAmount = 0;
 
     const row = document.createElement('tr');
     row.className = 'budget-row custom-row';
@@ -326,7 +324,7 @@
         </div>
       </td>
       <td class="center"><span class="tag ${config.tagClass}">${config.tagText}</span></td>
-      <td class="center">${formatMoney(suggestedAmount)}</td>
+      <td class="center"><span class="custom-suggested">Custom</span></td>
       <td class="center"><input class="amount-input" type="number" data-suggested="${suggestedAmount}" value="${suggestedAmount}" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
       <td class="center budget-status"></td>
     `;
@@ -338,22 +336,6 @@
     labelInput.focus();
     labelInput.select();
     recalc();
-  }
-
-  function promptForSuggestedAmount(label) {
-    const response = window.prompt(`Suggested amount for this ${label.toLowerCase()}?`, '0');
-
-    if (response === null) {
-      return null;
-    }
-
-    const value = Number(response.replace(/[$,]/g, '').trim());
-    if (!Number.isFinite(value) || value < 0) {
-      window.alert('Enter a valid non-negative amount.');
-      return promptForSuggestedAmount(label);
-    }
-
-    return value;
   }
 
   function removeBudgetRow(button) {
