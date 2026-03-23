@@ -93,6 +93,27 @@
     text-transform: uppercase; letter-spacing: .07em; color: #3949ab;
     padding: 6px 14px;
   }
+  .section-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .add-row-btn,
+  .remove-row-btn {
+    border: none; border-radius: 999px; font: inherit; font-weight: 700;
+    cursor: pointer; transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .add-row-btn {
+    background: #3949ab; color: white; padding: 7px 12px; letter-spacing: .02em;
+    text-transform: none;
+  }
+  .add-row-btn:hover,
+  .remove-row-btn:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(57, 73, 171, 0.16); }
+  .remove-row-btn {
+    background: #f3f4f8; color: #5f6368; padding: 6px 10px; font-size: 0.72rem;
+  }
+  .custom-label-wrap {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .custom-label-wrap .cat-label { flex: 1; }
 
   tfoot td {
     padding: 10px 14px; font-weight: 700; font-size: 0.85rem;
@@ -138,141 +159,213 @@
   </thead>
   <tbody id="tableBody">
 
-    <tr class="section-header"><td colspan="5">🏠 Needs</td></tr>
+    <tr class="section-header" id="needs-section">
+      <td colspan="5">
+        <div class="section-bar">
+          <span>🏠 Needs</span>
+          <button type="button" class="add-row-btn" onclick="addBudgetRow('need')">+ Add Need</button>
+        </div>
+      </td>
+    </tr>
 
-    <tr>
+    <tr class="budget-row" data-group="need">
       <td><input class="cat-label" type="text" value="🏠 Rent (1-BR avg, Bronx)"></td>
       <td class="center"><span class="tag need">Need</span></td>
       <td class="center">$1,630</td>
-      <td class="center"><input type="number" data-suggested="1630" value="1630" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
-      <td class="center" id="bar-rent"></td>
+      <td class="center"><input class="amount-input" type="number" data-suggested="1630" value="1630" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center budget-status"></td>
     </tr>
-    <tr>
+    <tr class="budget-row" data-group="need">
       <td><input class="cat-label" type="text" value="💡 Utilities (Electric/Internet)"></td>
       <td class="center"><span class="tag need">Need</span></td>
       <td class="center">$250</td>
-      <td class="center"><input type="number" data-suggested="250" value="250" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
-      <td class="center" id="bar-utilities"></td>
+      <td class="center"><input class="amount-input" type="number" data-suggested="250" value="250" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center budget-status"></td>
     </tr>
-    <tr>
+    <tr class="budget-row" data-group="need">
       <td><input class="cat-label" type="text" value="🛒 Groceries"></td>
       <td class="center"><span class="tag need">Need</span></td>
       <td class="center">$600</td>
-      <td class="center"><input type="number" data-suggested="600" value="600" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
-      <td class="center" id="bar-groceries"></td>
+      <td class="center"><input class="amount-input" type="number" data-suggested="600" value="600" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center budget-status"></td>
     </tr>
-    <tr>
+    <tr class="budget-row" data-group="need">
       <td><input class="cat-label" type="text" value="🚇 MetroCard / Transit"></td>
       <td class="center"><span class="tag need">Need</span></td>
       <td class="center">$140</td>
-      <td class="center"><input type="number" data-suggested="140" value="140" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
-      <td class="center" id="bar-transit"></td>
+      <td class="center"><input class="amount-input" type="number" data-suggested="140" value="140" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center budget-status"></td>
     </tr>
 
-    <tr class="section-header"><td colspan="5">🎯 Wants</td></tr>
+    <tr class="section-header" id="wants-section">
+      <td colspan="5">
+        <div class="section-bar">
+          <span>🎯 Wants</span>
+          <button type="button" class="add-row-btn" onclick="addBudgetRow('want')">+ Add Want</button>
+        </div>
+      </td>
+    </tr>
 
-    <tr>
+    <tr class="budget-row" data-group="want">
       <td><input class="cat-label" type="text" value="🍕 Dining Out"></td>
       <td class="center"><span class="tag want">Want</span></td>
       <td class="center">$200</td>
-      <td class="center"><input type="number" data-suggested="200" value="200" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
-      <td class="center" id="bar-dining"></td>
+      <td class="center"><input class="amount-input" type="number" data-suggested="200" value="200" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center budget-status"></td>
     </tr>
-    <tr>
+    <tr class="budget-row" data-group="want">
       <td><input class="cat-label" type="text" value="👟 Clothing / Shoes"></td>
       <td class="center"><span class="tag want">Want</span></td>
       <td class="center">$100</td>
-      <td class="center"><input type="number" data-suggested="100" value="100" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
-      <td class="center" id="bar-clothing"></td>
+      <td class="center"><input class="amount-input" type="number" data-suggested="100" value="100" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center budget-status"></td>
     </tr>
-    <tr>
+    <tr class="budget-row" data-group="want">
       <td><input class="cat-label" type="text" value="📱 Phone Plan"></td>
       <td class="center"><span class="tag want">Want</span></td>
       <td class="center">$80</td>
-      <td class="center"><input type="number" data-suggested="80" value="80" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
-      <td class="center" id="bar-phone"></td>
+      <td class="center"><input class="amount-input" type="number" data-suggested="80" value="80" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center budget-status"></td>
     </tr>
-    <tr>
+    <tr class="budget-row" data-group="want">
       <td><input class="cat-label" type="text" value="📺 Streaming / Subscriptions"></td>
       <td class="center"><span class="tag want">Want</span></td>
       <td class="center">$50</td>
-      <td class="center"><input type="number" data-suggested="50" value="50" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
-      <td class="center" id="bar-streaming"></td>
+      <td class="center"><input class="amount-input" type="number" data-suggested="50" value="50" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center budget-status"></td>
     </tr>
 
-    <tr class="section-header"><td colspan="5">💰 Savings</td></tr>
+    <tr class="section-header" id="savings-section"><td colspan="5">💰 Savings</td></tr>
 
-    <tr>
+    <tr class="budget-row" data-group="saving">
       <td><input class="cat-label" type="text" value="🏦 Savings (20% goal = $810)"></td>
       <td class="center"><span class="tag saving">Saving</span></td>
       <td class="center">$810</td>
-      <td class="center"><input type="number" data-suggested="810" value="810" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
-      <td class="center" id="bar-savings"></td>
+      <td class="center"><input class="amount-input" type="number" data-suggested="810" value="810" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center budget-status"></td>
     </tr>
 
   </tbody>
   <tfoot>
     <tr>
       <td colspan="2">TOTAL</td>
-      <td class="center">$3,860</td>
+      <td class="center" id="footSuggested">$3,860</td>
       <td class="center" id="footTotal">$3,860</td>
       <td class="center" id="footStatus">✅ $190 under</td>
     </tr>
   </tfoot>
 </table>
 
-<p class="note">💡 Try changing the Rent to $800 (roommate scenario) and see what opens up - that's the "play with numbers" moment from the lesson.</p>
+<p class="note">💡 Try changing the Rent to $800 (roommate scenario), or use the Add Need / Add Want buttons to model extra categories and see how the budget shifts.</p>
 
 <script>
   const INCOME = 4050;
-  const rows = [
-    { id: 'rent',       suggested: 1630 },
-    { id: 'utilities',  suggested: 250  },
-    { id: 'groceries',  suggested: 600  },
-    { id: 'transit',    suggested: 140  },
-    { id: 'dining',     suggested: 200  },
-    { id: 'clothing',   suggested: 100  },
-    { id: 'phone',      suggested: 80   },
-    { id: 'streaming',  suggested: 50   },
-    { id: 'savings',    suggested: 810  },
-  ];
+  const tableBody = document.getElementById('tableBody');
+  let customRowCount = 0;
+
+  function formatMoney(value) {
+    return '$' + Number(value).toLocaleString();
+  }
+
+  function getSuggestedValue(row) {
+    const suggestedInput = row.querySelector('.suggested-input');
+    if (suggestedInput) {
+      return parseFloat(suggestedInput.value) || 0;
+    }
+
+    const amountInput = row.querySelector('.amount-input');
+    return parseFloat(amountInput.dataset.suggested) || 0;
+  }
+
+  function buildStatusMarkup(value, suggested) {
+    const pct = Math.min((value / INCOME) * 100, 100);
+    const diff = value - suggested;
+    let color, cellClass, label;
+
+    if (diff <= 0) {
+      color = '#4caf50';
+      cellClass = 'cell-green';
+      label = diff === 0 ? 'On target' : `${formatMoney(Math.abs(diff))} under`;
+    } else if (diff <= 100) {
+      color = '#f9a825';
+      cellClass = 'cell-yellow';
+      label = `+${formatMoney(diff)} over`;
+    } else {
+      color = '#e53935';
+      cellClass = 'cell-red';
+      label = `+${formatMoney(diff)} over`;
+    }
+
+    return `
+      <div class="bar-wrap" title="${formatMoney(value)} of ${formatMoney(INCOME)}">
+        <div class="bar-fill" style="width:${pct}%;background:${color}"></div>
+      </div>
+      <span class="cell-amount ${cellClass}" style="margin-top:4px;font-size:0.75rem">${label}</span>
+    `;
+  }
+
+  function addBudgetRow(type) {
+    customRowCount += 1;
+
+    const defaults = {
+      need: { emoji: '➕', label: `New Need ${customRowCount}`, tagClass: 'need', tagText: 'Need', anchorId: 'wants-section' },
+      want: { emoji: '✨', label: `New Want ${customRowCount}`, tagClass: 'want', tagText: 'Want', anchorId: 'savings-section' },
+    };
+
+    const config = defaults[type];
+    const row = document.createElement('tr');
+    row.className = 'budget-row custom-row';
+    row.dataset.group = type;
+    row.innerHTML = `
+      <td>
+        <div class="custom-label-wrap">
+          <input class="cat-label" type="text" value="${config.emoji} ${config.label}">
+          <button type="button" class="remove-row-btn" onclick="removeBudgetRow(this)">Remove</button>
+        </div>
+      </td>
+      <td class="center"><span class="tag ${config.tagClass}">${config.tagText}</span></td>
+      <td class="center"><input class="suggested-input" type="number" value="0" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center"><input class="amount-input" type="number" value="0" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center budget-status"></td>
+    `;
+
+    const anchor = document.getElementById(config.anchorId);
+    tableBody.insertBefore(row, anchor);
+
+    const labelInput = row.querySelector('.cat-label');
+    labelInput.focus();
+    labelInput.select();
+    recalc();
+  }
+
+  function removeBudgetRow(button) {
+    const row = button.closest('.budget-row');
+    if (row) {
+      row.remove();
+      recalc();
+    }
+  }
 
   function recalc() {
     let total = 0;
-    const inputs = document.querySelectorAll('input[type=number]');
-    inputs.forEach((inp, i) => {
-      const val = parseFloat(inp.value) || 0;
-      const sug = parseFloat(inp.dataset.suggested);
+    let suggestedTotal = 0;
+
+    document.querySelectorAll('.budget-row').forEach((row) => {
+      const amountInput = row.querySelector('.amount-input');
+      const val = parseFloat(amountInput.value) || 0;
+      const sug = getSuggestedValue(row);
       total += val;
+      suggestedTotal += sug;
 
-      const barCell = document.getElementById('bar-' + rows[i].id);
-      const pct = Math.min((val / INCOME) * 100, 100);
-      const diff = val - sug;
-      let color, cellClass, label;
-
-      if (diff <= 0) {
-        color = '#4caf50'; cellClass = 'cell-green';
-        label = diff === 0 ? 'On target' : `$${Math.abs(diff)} under`;
-      } else if (diff <= 100) {
-        color = '#f9a825'; cellClass = 'cell-yellow';
-        label = `+$${diff} over`;
-      } else {
-        color = '#e53935'; cellClass = 'cell-red';
-        label = `+$${diff} over`;
-      }
-
-      barCell.innerHTML = `
-        <div class="bar-wrap" title="$${val} of $${INCOME}">
-          <div class="bar-fill" style="width:${pct}%;background:${color}"></div>
-        </div>
-        <span class="cell-amount ${cellClass}" style="margin-top:4px;font-size:0.75rem">${label}</span>
-      `;
+      const barCell = row.querySelector('.budget-status');
+      barCell.innerHTML = buildStatusMarkup(val, sug);
     });
 
     const left = INCOME - total;
-    document.getElementById('totalSpent').textContent = '$' + total.toLocaleString();
+    document.getElementById('totalSpent').textContent = formatMoney(total);
     document.getElementById('totalLeft').textContent = (left >= 0 ? '$' : '-$') + Math.abs(left).toLocaleString();
-    document.getElementById('footTotal').textContent = '$' + total.toLocaleString();
+    document.getElementById('footSuggested').textContent = formatMoney(suggestedTotal);
+    document.getElementById('footTotal').textContent = formatMoney(total);
 
     const leftCard = document.getElementById('leftCard');
     const statusCard = document.getElementById('statusCard');
@@ -283,17 +376,17 @@
       leftCard.className = 'card left';
       statusCard.className = 'card status-ok';
       statusText.textContent = '✅ Balanced';
-      footStatus.textContent = `✅ $${left} remaining`;
+      footStatus.textContent = `✅ ${formatMoney(left)} remaining`;
     } else if (left >= 0) {
       leftCard.className = 'card left';
       statusCard.className = 'card status-ok';
       statusText.textContent = '⚠️ Tight';
-      footStatus.textContent = `⚠️ Only $${left} left`;
+      footStatus.textContent = `⚠️ Only ${formatMoney(left)} left`;
     } else {
       leftCard.className = 'card spent';
       statusCard.className = 'card status-bad';
       statusText.textContent = '🔴 Over Budget';
-      footStatus.textContent = `🔴 $${Math.abs(left)} over budget`;
+      footStatus.textContent = `🔴 ${formatMoney(Math.abs(left))} over budget`;
     }
   }
 
