@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monthly Budget Planner</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; padding: 24px; color: #222; }
+  h1 { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; color: #1a1a2e; }
+  .subtitle { font-size: 0.85rem; color: #666; margin-bottom: 20px; }
+
+  .top-bar {
+    display: flex; align-items: center; gap: 20px; margin-bottom: 20px;
+    background: white; border-radius: 10px; padding: 16px 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .income-box { display: flex; flex-direction: column; }
+  .income-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: .05em; color: #888; }
+  .income-value { font-size: 1.5rem; font-weight: 700; color: #1a1a2e; }
+
+  .summary-cards { display: flex; gap: 12px; flex: 1; }
+  .card {
+    flex: 1; border-radius: 8px; padding: 12px 14px; text-align: center;
+    font-size: 0.8rem; font-weight: 600;
+  }
+  .card .val { font-size: 1.1rem; font-weight: 800; display: block; margin-top: 2px; }
+  .card.spent { background: #fff3f3; color: #c0392b; border: 1.5px solid #f5c6c6; }
+  .card.left  { background: #f0fff4; color: #27ae60; border: 1.5px solid #b2dfdb; }
+  .card.status-ok  { background: #e8f5e9; color: #2e7d32; border: 1.5px solid #a5d6a7; }
+  .card.status-bad { background: #ffebee; color: #c62828; border: 1.5px solid #ef9a9a; }
+
+  .legend { font-size: 0.78rem; color: #666; display: flex; gap: 14px; margin-bottom: 10px; }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .dot { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+  .dot.green { background: #c8f7c5; border: 1px solid #4caf50; }
+  .dot.red   { background: #ffc8c8; border: 1px solid #e53935; }
+  .dot.yellow{ background: #fff9c4; border: 1px solid #f9a825; }
+
+  table { width: 100%; border-collapse: collapse; background: white;
+    border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  thead th {
+    background: #1a1a2e; color: white; padding: 10px 14px;
+    font-size: 0.78rem; text-align: left; letter-spacing: .04em;
+  }
+  thead th:not(:first-child) { text-align: center; }
+  tbody tr:nth-child(even) { background: #fafafa; }
+  tbody tr:hover { background: #f0f4ff; }
+
+  td { padding: 9px 14px; font-size: 0.85rem; border-bottom: 1px solid #eee; vertical-align: middle; }
+  td.center { text-align: center; }
+
+  .tag {
+    font-size: 0.68rem; padding: 2px 7px; border-radius: 99px; font-weight: 700;
+    letter-spacing: .03em;
+  }
+  .tag.need   { background: #e3f2fd; color: #1565c0; }
+  .tag.want   { background: #fce4ec; color: #c2185b; }
+  .tag.saving { background: #e8f5e9; color: #2e7d32; }
+
+  .cat-label {
+    background: none; border: none; font-size: 0.85rem; font-family: inherit;
+    color: #333; width: 100%; padding: 2px 4px; border-radius: 4px;
+    cursor: text; transition: background .15s, border .15s;
+    border: 1.5px solid transparent;
+  }
+  .cat-label:hover { background: #f0f4ff; border-color: #c5cae9; }
+  .cat-label:focus { outline: none; background: #fff; border-color: #5c6bc0; }
+
+  input[type=number] {
+    width: 90px; padding: 5px 8px; border-radius: 6px; border: 1.5px solid #ddd;
+    font-size: 0.85rem; text-align: right; transition: border .2s;
+    font-family: inherit;
+  }
+  input[type=number]:focus { outline: none; border-color: #5c6bc0; }
+
+  .cell-amount {
+    font-weight: 700; font-size: 0.9rem;
+    padding: 5px 10px; border-radius: 6px; min-width: 80px;
+    display: inline-block; text-align: right;
+  }
+  .cell-green  { background: #c8f7c5; color: #1b5e20; }
+  .cell-red    { background: #ffc8c8; color: #b71c1c; }
+  .cell-yellow { background: #fff9c4; color: #f57f17; }
+
+  .bar-wrap { width: 100%; background: #eee; border-radius: 99px; height: 8px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 99px; transition: width .4s ease; }
+
+  .note { font-size: 0.72rem; color: #888; margin-top: 16px; text-align: center; }
+
+  .section-header td {
+    background: #e8eaf6; font-weight: 700; font-size: 0.75rem;
+    text-transform: uppercase; letter-spacing: .07em; color: #3949ab;
+    padding: 6px 14px;
+  }
+
+  tfoot td {
+    padding: 10px 14px; font-weight: 700; font-size: 0.85rem;
+    background: #1a1a2e; color: white;
+  }
+  tfoot td.center { text-align: center; }
+
+  .edit-hint { font-size: 0.7rem; color: #aaa; margin-left: 6px; font-style: italic; }
+</style>
+</head>
+<body>
+
+<h1>📊 Monthly Budget Planner</h1>
+<p class="subtitle">Bronx household scenario · Monthly income: $4,050 · Cells turn <strong style="color:#c0392b">red</strong> when over budget, <strong style="color:#27ae60">green</strong> when balanced. <span class="edit-hint">✏️ Click any category name to rename it.</span></p>
+
+<div class="top-bar">
+  <div class="income-box">
+    <span class="income-label">Monthly Income</span>
+    <span class="income-value">$4,050</span>
+  </div>
+  <div class="summary-cards">
+    <div class="card spent">Total Spent <span class="val" id="totalSpent">$0</span></div>
+    <div class="card left" id="leftCard">Remaining <span class="val" id="totalLeft">$4,050</span></div>
+    <div class="card" id="statusCard">Status <span class="val" id="statusText">—</span></div>
+  </div>
+</div>
+
+<div class="legend">
+  <span><span class="dot green"></span> Under / at budget</span>
+  <span><span class="dot red"></span> Over budget</span>
+  <span><span class="dot yellow"></span> Near limit (within $100)</span>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:36%">Category</th>
+      <th style="width:12%">Type</th>
+      <th style="width:16%">Suggested $</th>
+      <th style="width:16%">Your Amount</th>
+      <th style="width:20%">vs. Budget</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody">
+
+    <tr class="section-header"><td colspan="5">🏠 Needs</td></tr>
+
+    <tr>
+      <td><input class="cat-label" type="text" value="🏠 Rent (1-BR avg, Bronx)"></td>
+      <td class="center"><span class="tag need">Need</span></td>
+      <td class="center">$1,630</td>
+      <td class="center"><input type="number" data-suggested="1630" value="1630" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center" id="bar-rent"></td>
+    </tr>
+    <tr>
+      <td><input class="cat-label" type="text" value="💡 Utilities (Electric/Internet)"></td>
+      <td class="center"><span class="tag need">Need</span></td>
+      <td class="center">$250</td>
+      <td class="center"><input type="number" data-suggested="250" value="250" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center" id="bar-utilities"></td>
+    </tr>
+    <tr>
+      <td><input class="cat-label" type="text" value="🛒 Groceries"></td>
+      <td class="center"><span class="tag need">Need</span></td>
+      <td class="center">$600</td>
+      <td class="center"><input type="number" data-suggested="600" value="600" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center" id="bar-groceries"></td>
+    </tr>
+    <tr>
+      <td><input class="cat-label" type="text" value="🚇 MetroCard / Transit"></td>
+      <td class="center"><span class="tag need">Need</span></td>
+      <td class="center">$140</td>
+      <td class="center"><input type="number" data-suggested="140" value="140" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center" id="bar-transit"></td>
+    </tr>
+
+    <tr class="section-header"><td colspan="5">🎯 Wants</td></tr>
+
+    <tr>
+      <td><input class="cat-label" type="text" value="🍕 Dining Out"></td>
+      <td class="center"><span class="tag want">Want</span></td>
+      <td class="center">$200</td>
+      <td class="center"><input type="number" data-suggested="200" value="200" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center" id="bar-dining"></td>
+    </tr>
+    <tr>
+      <td><input class="cat-label" type="text" value="👟 Clothing / Shoes"></td>
+      <td class="center"><span class="tag want">Want</span></td>
+      <td class="center">$100</td>
+      <td class="center"><input type="number" data-suggested="100" value="100" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center" id="bar-clothing"></td>
+    </tr>
+    <tr>
+      <td><input class="cat-label" type="text" value="📱 Phone Plan"></td>
+      <td class="center"><span class="tag want">Want</span></td>
+      <td class="center">$80</td>
+      <td class="center"><input type="number" data-suggested="80" value="80" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center" id="bar-phone"></td>
+    </tr>
+    <tr>
+      <td><input class="cat-label" type="text" value="📺 Streaming / Subscriptions"></td>
+      <td class="center"><span class="tag want">Want</span></td>
+      <td class="center">$50</td>
+      <td class="center"><input type="number" data-suggested="50" value="50" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center" id="bar-streaming"></td>
+    </tr>
+
+    <tr class="section-header"><td colspan="5">💰 Savings</td></tr>
+
+    <tr>
+      <td><input class="cat-label" type="text" value="🏦 Savings (20% goal = $810)"></td>
+      <td class="center"><span class="tag saving">Saving</span></td>
+      <td class="center">$810</td>
+      <td class="center"><input type="number" data-suggested="810" value="810" min="0" max="99999" onchange="recalc()" oninput="recalc()"></td>
+      <td class="center" id="bar-savings"></td>
+    </tr>
+
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2">TOTAL</td>
+      <td class="center">$3,860</td>
+      <td class="center" id="footTotal">$3,860</td>
+      <td class="center" id="footStatus">✅ $190 under</td>
+    </tr>
+  </tfoot>
+</table>
+
+<p class="note">💡 Try changing the Rent to $800 (roommate scenario) and see what opens up - that's the "play with numbers" moment from the lesson.</p>
+
+<script>
+  const INCOME = 4050;
+  const rows = [
+    { id: 'rent',       suggested: 1630 },
+    { id: 'utilities',  suggested: 250  },
+    { id: 'groceries',  suggested: 600  },
+    { id: 'transit',    suggested: 140  },
+    { id: 'dining',     suggested: 200  },
+    { id: 'clothing',   suggested: 100  },
+    { id: 'phone',      suggested: 80   },
+    { id: 'streaming',  suggested: 50   },
+    { id: 'savings',    suggested: 810  },
+  ];
+
+  function recalc() {
+    let total = 0;
+    const inputs = document.querySelectorAll('input[type=number]');
+    inputs.forEach((inp, i) => {
+      const val = parseFloat(inp.value) || 0;
+      const sug = parseFloat(inp.dataset.suggested);
+      total += val;
+
+      const barCell = document.getElementById('bar-' + rows[i].id);
+      const pct = Math.min((val / INCOME) * 100, 100);
+      const diff = val - sug;
+      let color, cellClass, label;
+
+      if (diff <= 0) {
+        color = '#4caf50'; cellClass = 'cell-green';
+        label = diff === 0 ? 'On target' : `$${Math.abs(diff)} under`;
+      } else if (diff <= 100) {
+        color = '#f9a825'; cellClass = 'cell-yellow';
+        label = `+$${diff} over`;
+      } else {
+        color = '#e53935'; cellClass = 'cell-red';
+        label = `+$${diff} over`;
+      }
+
+      barCell.innerHTML = `
+        <div class="bar-wrap" title="$${val} of $${INCOME}">
+          <div class="bar-fill" style="width:${pct}%;background:${color}"></div>
+        </div>
+        <span class="cell-amount ${cellClass}" style="margin-top:4px;font-size:0.75rem">${label}</span>
+      `;
+    });
+
+    const left = INCOME - total;
+    document.getElementById('totalSpent').textContent = '$' + total.toLocaleString();
+    document.getElementById('totalLeft').textContent = (left >= 0 ? '$' : '-$') + Math.abs(left).toLocaleString();
+    document.getElementById('footTotal').textContent = '$' + total.toLocaleString();
+
+    const leftCard = document.getElementById('leftCard');
+    const statusCard = document.getElementById('statusCard');
+    const statusText = document.getElementById('statusText');
+    const footStatus = document.getElementById('footStatus');
+
+    if (left > 100) {
+      leftCard.className = 'card left';
+      statusCard.className = 'card status-ok';
+      statusText.textContent = '✅ Balanced';
+      footStatus.textContent = `✅ $${left} remaining`;
+    } else if (left >= 0) {
+      leftCard.className = 'card left';
+      statusCard.className = 'card status-ok';
+      statusText.textContent = '⚠️ Tight';
+      footStatus.textContent = `⚠️ Only $${left} left`;
+    } else {
+      leftCard.className = 'card spent';
+      statusCard.className = 'card status-bad';
+      statusText.textContent = '🔴 Over Budget';
+      footStatus.textContent = `🔴 $${Math.abs(left)} over budget`;
+    }
+  }
+
+  recalc();
+</script>
+</body>
+</html>
